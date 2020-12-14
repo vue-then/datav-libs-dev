@@ -5,6 +5,7 @@
 </template>
 <script>
 import { ref, getCurrentInstance, onMounted, onUnmounted, nextTick } from 'vue'
+// import { debounce } from '../../../../Documents/code-view/chart-tixike/ziliao/imooc-datav-screen/src/components/Container/util'
 
 export default {
   name:'Container',
@@ -75,12 +76,37 @@ export default {
       updateScale()
     }
 
+    // 文件解耦
+    const initMutationObserver = () => {
+      const MutationObserver = window.MutationObserver
+      observer.observer(dom, {
+        attributes: true,
+        attributeFilter: ['style'],
+        attributeOldValue: true
+      })
+    }
+
+    const removeMutationObserver = () => {
+      if(observer){
+        observer.disconnect()
+        observer.takeRecords()
+        observer = null
+      }
+    }
+
     onMounted(async()=>{
       ready.value = false
       context = getCurrentInstance().ctx
       await initSize()
       await updateSize()
       window.addEventListener('resize', onResize())
+      
+      // initMutationObserver()
+      // window.addEventListener('resize', debounce(100,onResize))
+    })
+    onUnmounted(() => {
+      window.removeEventListener('resize', onResize)
+      // removeMutationObserver()
     })
 
     return {
